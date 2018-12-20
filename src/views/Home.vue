@@ -12,7 +12,14 @@
           <div class="row d-flex justify-content-center">
             <div v-for="category in categories">
               <!-- <section class="card"> -->
-              <div class="card text-center" style="width: 15rem;">
+              <div
+                @mouseover="categoryCardHover(category);"
+                @mouseleave="categoryCardLeave(category);"
+                class="card text-center border"
+                v-bind:class="`${category.cardMouseHover}` + ` m-1`"
+                style="width: 15rem"
+                v-on:click="setCategoryUpdate(category);"
+              >
                 <!--
                   <button
                     v-on:click="setCategoryUpdate(category);"
@@ -29,10 +36,10 @@
                   <h5 class="card-title">{{ category.category_name }}</h5>
                   <div class="progress">
                     <div
-                      class="progress-bar bg-success"
-                      role="progressbar"
+                      v-bind:class="`progress-bar ` + `${category.progress_style}`"
                       v-bind:style="`width: ${category.progress}%`"
                       v-bind:aria-valuenow="category.progress"
+                      role="progressbar"
                       aria-valuemin="0"
                       aria-valuemax="100"
                     ></div>
@@ -61,7 +68,7 @@
             <!-- Add Category Card -->
             <!-- ----------------------------------------------------------- -->
 
-            <div class="card text-center" style="width: 15rem;">
+            <div class="card text-center border m-1" style="width: 15rem;">
               <div data-toggle="modal" data-target="#addCategoryModal" v-on:click="" class="card-body">
                 <img src="../assets/add.png" alt="Add Category" height="70" width="70" padding-top="1" />
               </div>
@@ -254,55 +261,67 @@
         <!-- ----------------------------------------------------- -->
         <div id="posted-accordion">
           <div class="card mt-3">
-            <div class="card-header" id="postedTransactions">
-              <i class="fas fa-table"></i>
-              <a data-toggle="collapse" data-target="#postedTrans" aria-expanded="true" aria-controls="postedTrans">
-                Posted Transactions</a
+            <div class="card-header">
+              <button
+                data-toggle="modal"
+                data-target="#updateCategoryModal"
+                type="button"
+                class="float-right btn btn-link btn-sm"
+              >
+                Edit Category
+              </button>
+              <a
+                class="d-flex align-items-center"
+                data-toggle="collapse"
+                data-target="#postedTrans"
+                aria-expanded="true"
+                aria-controls="postedTrans"
+              >
+                <h2>{{ categoryUpdate.category_name }} Transactions</h2></a
               >
             </div>
-            <div
-              id="postedTrans"
-              class="collapse show"
-              aria-labelledby="postedTransactions"
-              data-parent="#posted-accordion"
-            >
+            <div id="postedTrans" class="collapse show" data-parent="#posted-accordion">
               <div class="card-body">
-                <div class="table-responsive">
+                <div class="table-responsive table-hover table-sm">
                   <table class="table table-bordered" id="dataTablePosted" width="100%" cellspacing="0">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Transaction Name</th>
-                        <th>Amount</th>
-                        <th>Category</th>
-                        <th>Pending</th>
+                        <th style="text-align:center">Date</th>
+                        <th style="text-align:center">Account</th>
+                        <th style="text-align:center">Transaction Name</th>
+                        <th style="text-align:center">Amount</th>
+                        <th style="text-align:center">Category</th>
+                        <th style="text-align:center">Pending</th>
                       </tr>
                     </thead>
-                    <tfoot>
-                      <tr>
-                        <th>Date</th>
-                        <th>Transaction Name</th>
-                        <th>Amount</th>
-                        <th>Category</th>
-                        <th>Pending</th>
-                      </tr>
-                    </tfoot>
+                    <!--
+                      <tfoot>
+                        <tr>
+                          <th>Date</th>
+                          <th>Transaction Name</th>
+                          <th>Amount</th>
+                          <th>Category</th>
+                          <th>Pending</th>
+                        </tr>
+                      </tfoot>
+                    -->
                     <tbody
                       v-for="transaction in transactions"
                       v-if="!transaction.pending && transaction.category_id == selectedCategory"
                     >
                       <tr>
-                        <td>{{ transaction.transaction_date }}</td>
-                        <td>{{ transaction.name }}</td>
-                        <td>{{ transaction.amount_formatted }}</td>
+                        <td style="text-align:center">{{ transaction.transaction_date }}</td>
+                        <td style="text-align:center">{{ transaction.account_name }}</td>
+                        <td style="text-align:center">{{ transaction.name }}</td>
+                        <td style="text-align:center">{{ transaction.amount_formatted }}</td>
                         <!-- Update Category Dropdown -->
                         <!-- ----------------------------------------------- -->
-                        <td>
+                        <td style="text-align:center">
                           <div class="btn-group">
                             <button
                               type="button"
                               v-on:click="setCurrentTransaction(transaction);"
-                              class="btn btn-light dropdown-toggle btn-sm"
+                              class="btn btn-light dropdown-toggle btn-sm btn-block"
                               data-toggle="dropdown"
                               aria-haspopup="true"
                               aria-expanded="false"
@@ -323,7 +342,7 @@
                           </div>
                         </td>
                         <!-- ----------------------------------------------- -->
-                        <td>{{ transaction.pending }}</td>
+                        <td style="text-align:center">{{ transaction.pending_formatted }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -367,18 +386,21 @@ export default {
       //Chart.js
       myPieChart: null,
 
-      // Transaction data
+      // Transaction Data
       transactions: [],
       currentTransaction: {},
       updateTransCategory: "",
       category_id: this.$route.params.id,
-      selectedCategory: ""
+      selectedCategory: "",
+
+      //Card Hover Styles
+      cardMouseOn: ""
     };
   },
   created: function() {
-    //Runs when the page is loaded.
+    // Runs before HTML is created
 
-    //Retrieve all transactions
+    // Retrieve all transactions
     axios.get("http://localhost:3000/api/transactions").then(
       function(response) {
         console.log(response.data);
@@ -386,6 +408,7 @@ export default {
       }.bind(this)
     );
   },
+
   mounted: function() {
     // Chart is created after HTML is loaded and web request for categories is launched.
     axios.get("http://localhost:3000/api/categories").then(
@@ -408,14 +431,15 @@ export default {
               {
                 data: chartData,
                 backgroundColor: [
-                  "#003f5c",
-                  "#2f4b7c",
-                  "#665191",
-                  "#a05195",
-                  "#d45087",
-                  "#f95d6a",
-                  "#ff7c43",
-                  "#ffa600"
+                  "#28A746",
+                  "#a4c400",
+                  "#60a917",
+                  "#008a00",
+                  "#6d8764",
+                  "#1ba1e2",
+                  "#e3c800",
+                  "#825a2c",
+                  "#a0522d"
                 ]
               }
             ]
@@ -565,27 +589,25 @@ export default {
           );
         }.bind(this)
       );
+    },
 
-      // // Refreshes to the categories array to call in new "amount_spent"
-      // axios.get("http://localhost:3000/api/categories").then(
-      //   function(response) {
-      //     console.log(response.data);
-      //     this.categories = response.data;
+    // Styling Helpers
+    // ---------------------------------------------------------------- //
+    categoryCardHover: function(category) {
+      console.log("Hover");
+      category.cardMouseHover = "border-success";
+    },
 
-      //     // Updates chart data for "amount_spent"
-      //     console.log("Update chart...");
+    categoryCardLeave: function(category) {
+      console.log("Leave");
+      category.cardMouseHover = "";
+    },
 
-      //     var chartData = this.categories.map(category => category.amount_spent);
-      //     console.log(chartData);
-      //     var chartLabels = this.categories.map(category => category.category_name);
-      //     console.log(chartLabels);
-
-      //     this.myPieChart.data.datasets[0].data = [69, "12254.49", "4506.33", "3578.5"]; //chartData
-      //     this.myPieChart.data.labels = chartLabels;
-      //     this.myPieChart.update();
-      //   }.bind(this)
-      // );
+    categoryCardClick: function(category) {
+      console.log("Click");
+      // category.cardMouseHover = "border-success";
     }
+    // ---------------------------------------------------------------- //
   },
   computed: {}
 };
