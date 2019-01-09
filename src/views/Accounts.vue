@@ -1,56 +1,29 @@
 <template>
   <div class="container">
     <div class="accounts">
-      <!-- Institution Card -->
-      <!-- ----------------------------------------------------------- -->
-      <div v-for="item in items">
-        <div class="card">
-          <div class="card-header">
-            {{ item.name }}
-            <button
-              v-on:click="updateTransactions(item.id);"
-              type="button"
-              class="btn
-          btn-primary btn-sm"
-            >
-              Update Transactions
-            </button>
-          </div>
-          <div class="card-body">
-            <!-- Account Card (By Institution) -->
-            <!-- ----------------------------------------------------------- -->
-            <div>
-              <div class="container">
-                <div class="row">
-                  <div class="col-sm-4" v-for="account in accounts" v-if="account.item_id == item.id">
-                    <section class="hover-card">
-                      <div class="card text-center m-2" style="width: 15rem;">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ account.name }}</h5>
-                          <h6 class="card-subtitle mb-2 text-muted">
-                            {{ account.subtype }} ({{ account.currency_type }})
-                          </h6>
-                          <button
-                            v-on:click="setAccountUpdate(account);"
-                            type="button"
-                            class="btn btn-outline-secondary btn-sm"
-                            data-toggle="modal"
-                            data-target="#updateAccountModel"
-                          >
-                            Edit Name
-                          </button>
-                          <p class="card-text">Available: {{ account.available }}</p>
-                          <p class="card-text">Current: {{ account.current }}</p>
-                        </div>
-                      </div>
-                    </section>
+      <!-- Account Subtype Card -->
+      <div v-for="subtype in subtypes">
+        <div class="row d-flex justify-content-center pt-3">
+          <div class="card w-75 ">
+            <div class="card-header">{{ subtype }}</div>
+            <div class="container pt-3">
+              <div v-for="account in accounts" v-if="account.subtype_formatted === subtype">
+                <div class="row pb-3">
+                  <div class="col d-flex align-items-center justify-content-center p-0">
+                    <h5>{{ account.name }}</h5>
+                  </div>
+                  <div class="col p-0">
+                    <div class="row justify-content-center"><span class="font-italic">Available Amount</span></div>
+                    <div class="row justify-content-center">{{ account.available_formatted }}</div>
+                  </div>
+                  <div class="col p-0">
+                    <div class="row justify-content-center"><span class="font-italic">Current Amount</span></div>
+                    <div class="row justify-content-center">{{ account.current_formatted }}</div>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- ----------------------------------------------------------- -->
           </div>
-          <div class="card-footer text-muted">Last updated ...</div>
         </div>
       </div>
       <!-- ----------------------------------------------------------- -->
@@ -106,6 +79,7 @@ var axios = require("axios");
 export default {
   data: function() {
     return {
+      subtypes: new Set(),
       items: [],
       accounts: [],
       currentAccount: {},
@@ -115,16 +89,28 @@ export default {
       // category_id: this.$route.params.id
     };
   },
-  created: function() {
-    //Runs when the page is loaded.
 
+  // Runs when the page is loaded
+  created: function() {
+    // Retrieves account information
     axios.get("http://localhost:3000/api/accounts").then(
       function(response) {
         console.log(response.data);
         this.accounts = response.data;
+
+        // Populates account subtype set. Used to determine which subtype modules to display.
+        this.accounts.forEach(
+          function(account) {
+            this.subtypes.add(account.subtype_formatted);
+          }.bind(this)
+        );
+
+        this.subtypes = Array.from(this.subtypes); // Converts Set to Array
+        console.log(this.subtypes);
       }.bind(this)
     );
 
+    // Retrieves institution information associated with each account
     axios.get("http://localhost:3000/api/items").then(
       function(response) {
         console.log(response.data);
