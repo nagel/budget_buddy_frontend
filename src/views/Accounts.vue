@@ -1,24 +1,31 @@
 <template>
   <div class="container">
     <div class="accounts">
+      <h1 style="text-align: center; padding-top: 15px">Accounts</h1>
+
       <!-- Account Subtype Card -->
       <div v-for="subtype in subtypes">
         <div class="row d-flex justify-content-center pt-3">
           <div class="card w-75 ">
-            <div class="card-header">{{ subtype }}</div>
-            <div class="container pt-3">
-              <div v-for="account in accounts" v-if="account.subtype_formatted === subtype">
-                <div class="row pb-3">
-                  <div class="col d-flex align-items-center justify-content-center p-0">
-                    <h5>{{ account.name }}</h5>
-                  </div>
-                  <div class="col p-0">
-                    <div class="row justify-content-center"><span class="font-italic">Available Amount</span></div>
-                    <div class="row justify-content-center">{{ account.available_formatted }}</div>
-                  </div>
-                  <div class="col p-0">
-                    <div class="row justify-content-center"><span class="font-italic">Current Amount</span></div>
-                    <div class="row justify-content-center">{{ account.current_formatted }}</div>
+            <div class="card-header font-weight-bold">{{ subtype }}</div>
+            <div class="card-body">
+              <div class="container">
+                <div v-for="account in accounts" v-if="account.subtype_formatted === subtype">
+                  <div class="row pb-3">
+                    <div class="col">
+                      <div class="row justify-content-center">{{ account.name }}</div>
+                      <div class="row justify-content-center text-muted font-italic small">
+                        Last updated {{ account.updated_at_formatted }}
+                      </div>
+                    </div>
+                    <div class="col p-0">
+                      <div class="row justify-content-center"><span class="font-italic">Available Amount</span></div>
+                      <div class="row justify-content-center">{{ account.available_formatted }}</div>
+                    </div>
+                    <div class="col p-0">
+                      <div class="row justify-content-center"><span class="font-italic">Current Amount</span></div>
+                      <div class="row justify-content-center">{{ account.current_formatted }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -93,7 +100,8 @@ export default {
   // Runs when the page is loaded
   created: function() {
     // Retrieves account information
-    axios.get("http://localhost:3000/api/accounts").then(
+
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/accounts", { params: { page: "accounts." } }).then(
       function(response) {
         console.log(response.data);
         this.accounts = response.data;
@@ -111,7 +119,7 @@ export default {
     );
 
     // Retrieves institution information associated with each account
-    axios.get("http://localhost:3000/api/items").then(
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/items").then(
       function(response) {
         console.log(response.data);
         this.items = response.data;
@@ -130,7 +138,7 @@ export default {
 
       console.log("The Account ID used to update is: " + this.currentAccount.id);
 
-      axios.patch(`http://localhost:3000/api/accounts/${this.currentAccount.id}`, params).then(
+      axios.patch(`https://stark-brushlands-11677.herokuapp.com/api/accounts/${this.currentAccount.id}`, params).then(
         function(response) {
           console.log(response.data);
 
@@ -148,7 +156,7 @@ export default {
         id: id
       };
 
-      axios.post("http://localhost:3000/api/transactions", params).then(
+      axios.post("https://stark-brushlands-11677.herokuapp.com/api/transactions", params).then(
         function(response) {
           console.log("Requested");
         }.bind(this)

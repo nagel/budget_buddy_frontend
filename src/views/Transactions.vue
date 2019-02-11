@@ -183,14 +183,14 @@ export default {
   created: function() {
     //Runs when the page is loaded.
 
-    axios.get("http://localhost:3000/api/transactions").then(
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/transactions").then(
       function(response) {
         console.log(response.data);
         this.transactions = response.data;
       }.bind(this)
     );
 
-    axios.get("http://localhost:3000/api/categories").then(
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/categories").then(
       function(response) {
         console.log(response.data);
         this.categories = response.data;
@@ -215,7 +215,7 @@ export default {
       console.log("Transaction ID " + this.currentTransaction.id + " will be updated...");
       console.log("The category ID to update the transaction with is: " + this.updateTransCategory);
 
-      axios.patch(`http://localhost:3000/api/transactions/${this.currentTransaction.id}`, params).then(
+      axios.patch(`https://stark-brushlands-11677.herokuapp.com/api/transactions/${this.currentTransaction.id}`, params).then(
         function(response) {
           console.log(response.data);
           // Update the front-end category name

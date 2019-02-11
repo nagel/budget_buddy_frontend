@@ -401,7 +401,7 @@ export default {
     // Runs before HTML is created
 
     // Retrieve all transactions
-    axios.get("http://localhost:3000/api/transactions").then(
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/transactions").then(
       function(response) {
         console.log(response.data);
         this.transactions = response.data;
@@ -411,7 +411,7 @@ export default {
 
   mounted: function() {
     // Chart is created after HTML is loaded and web request for categories is launched.
-    axios.get("http://localhost:3000/api/categories").then(
+    axios.get("https://stark-brushlands-11677.herokuapp.com/api/categories").then(
       function(response) {
         console.log(response.data);
         this.categories = response.data;
@@ -454,7 +454,7 @@ export default {
       console.log("The selected category is: " + this.selectedCategory);
 
       // When a new category is selected, transactions array will be updated to reflect any possibe category changes the user made.
-      axios.get("http://localhost:3000/api/transactions").then(
+      axios.get("https://stark-brushlands-11677.herokuapp.com/api/transactions").then(
         function(response) {
           console.log(response.data);
           this.transactions = response.data;
@@ -468,7 +468,7 @@ export default {
         budget_limit: this.newBudgetLimit
       };
 
-      axios.post("http://localhost:3000/api/categories", params).then(
+      axios.post("https://stark-brushlands-11677.herokuapp.com/api/categories", params).then(
         function(response) {
           console.log(response.data);
           this.newCategoryName = "";
@@ -497,7 +497,7 @@ export default {
 
       //console.log(this.$route.params.id);
 
-      axios.patch(`http://localhost:3000/api/categories/${id}`, params).then(
+      axios.patch(`https://stark-brushlands-11677.herokuapp.com/api/categories/${id}`, params).then(
         function(response) {
           console.log(response.data);
           console.log("Category Updated!");
@@ -533,7 +533,7 @@ export default {
         budget_limit: this.updateBudgetLimit
       };
 
-      axios.delete(`http://localhost:3000/api/categories/${id}`, params).then(
+      axios.delete(`https://stark-brushlands-11677.herokuapp.com/api/categories/${id}`, params).then(
         function(response) {
           console.log(response.data);
           console.log("Category Deleted!");
@@ -562,14 +562,14 @@ export default {
       console.log("The category ID to update the transaction with is: " + this.updateTransCategory);
 
       // Updates back-end with new category
-      axios.patch(`http://localhost:3000/api/transactions/${this.currentTransaction.id}`, params).then(
+      axios.patch(`https://stark-brushlands-11677.herokuapp.com/api/transactions/${this.currentTransaction.id}`, params).then(
         function(response) {
           console.log(response.data);
           //Updates category name on the front-end
           this.currentTransaction.category_info = response.data.category_info;
 
           // Refreshes to the categories array to call in new "amount_spent"
-          axios.get("http://localhost:3000/api/categories").then(
+          axios.get("https://stark-brushlands-11677.herokuapp.com/api/categories").then(
             function(response) {
               console.log(response.data);
               this.categories = response.data;

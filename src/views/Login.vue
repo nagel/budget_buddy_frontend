@@ -71,7 +71,7 @@ export default {
         password: this.password
       };
       axios
-        .post("http://localhost:3000/api/sessions", params)
+        .post("https://stark-brushlands-11677.herokuapp.com/api/sessions", params)
         .then(response => {
           axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.jwt;
           localStorage.setItem("jwt", response.data.jwt);

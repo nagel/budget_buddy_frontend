@@ -43,7 +43,7 @@ export default {
         password_confirmation: this.passwordConfirmation
       };
       axios
-        .post("http://localhost:3000/api/users", params)
+        .post("https://stark-brushlands-11677.herokuapp.com/api/users", params)
         .then(response => {
           this.$router.push("/login");
         })
